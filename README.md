@@ -17,8 +17,8 @@ TODO:
 6. Auomatically extract audio from video when exporting video in DaVinci Resolve
 7. Auomatically extract audio from video when exporting video in DaVinci Resolve in 1080p only (a.k.a. "final export")
 ---
-#. Get metadata from AirTable
-#. Build an API for Anchor
-#. Upload to YouTube
-#. Upload to Anchor
-#. Automate everything when exporting video in 1080p only
+X. Get metadata from AirTable
+X. Build an API for Anchor
+X. Upload to YouTube
+X. Upload to Anchor
+X. Automate everything when exporting video in 1080p only
