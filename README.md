@@ -1,4 +1,4 @@
-# ScrumLife-ExportScripts
+# ScrumLife-Scripts
 Scripts to automate tasks used for the Scrum Life show
 
 Links:
