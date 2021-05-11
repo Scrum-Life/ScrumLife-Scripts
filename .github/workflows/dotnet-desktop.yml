@@ -58,7 +58,7 @@ jobs:
     env:
       Solution_Name: VideoManager.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: VideoManager\Infrastructure.UnitTests\Infrastructure.UnitTests.csproj   # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Wap_Project_Directory: VideoManager.GUI    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
+      Wap_Project_Directory: VideoManager\VideoManager.GUI\bin    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
       Wap_Project_Path: VideoManager\VideoManager.GUI\VideoManager.GUI.csproj                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
@@ -90,4 +90,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        path: ${{ env.Wap_Project_Directory }}
