@@ -43,8 +43,9 @@ jobs:
     env:
       Solution_Path: VideoManager\VideoManager.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: VideoManager\Infrastructure.UnitTests\Infrastructure.UnitTests.csproj   # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Project_Directory: VideoManager\VideoManager.GUI\bin    # Replace with the project directory relative to the solution, i.e. MyWpfApp.Package.
+      Project_Directory: VideoManager\VideoManager.GUI    # Replace with the project directory relative to the solution, i.e. MyWpfApp.Package.
       Project_Path: VideoManager\VideoManager.GUI\VideoManager.GUI.csproj                   # Replace with the path to your project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+      SigningCertificate: SLVideoManagerCert.pfx
 
     steps:
     - name: Checkout
@@ -68,18 +69,18 @@ jobs:
       
     # Restore the application
     - name:  Restore application
-      run: msbuild $env:Solution_Path /t:Restore
+      run: dotnet restore $env:Solution_Path /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet build $env:Project_Path  -c ${{ matrix.configuration }}
+      run: dotnet build -c ${{ matrix.configuration }} -o binOutput $env:Project_Path 
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: VideoManager GUI
-        path: ${{ env.Project_Directory }}
+        path: ${{ env.Project_Directory }}\bin
