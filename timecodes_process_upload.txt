@@ -1,0 +1,55 @@
+01:40 : Ouverture des data Airtable
+01:46 : Copie data MorningFrame
+02:25 : Ajout de la vignette dans Airtable
+03:15 : Création d'une URL Scumlife.tv
+03:45 : Insertion du sommaire de la vidéo
+04:00 : Rédaction présentation invité
+06:00 : Rédaction hashtags
+06:20 : Rédaction crédits
+07:05 : Rédaction titre live bonus (vérifier si titre pas trop long, max 100)
+07:30 : Création du broadcast Streamyard
+10:44 : Import vidéo YT
+11:29 : Récupération lien du live YT (insertion dans Airtable)
+11:44 : Récupération lien de la vidéo YT (insertion dans Airtable)
+11:50 : Copie des données Airtable vers YT (titre)
+12:35 : Création des liens courts pour la description
+16:30 : Copie description vers YT
+17:00 : Sélection playlist dans YT Studio
+17:19 : Sélection autres params dans YT Studio (pas conçue pour les enfants, ...
+17:23 : Copie des tags depuis Airtable
+17:34 : Non insertion des sous-titres 🙃
+17:40 : Sélection de la catégorie de vidéo dans YT Studio
+18:00 : Vérification
+18:11 : Choix monétisation
+18:17 : Ecrans de fin
+19:32 : Vérification publication
+19:59 : Ajout bande annonce
+23:35 : Publication OK
+24:06 : Activation chat en direct 🐱
+24:35 : Création des liens pour le live
+24:47 : Insertion de la description pour le live
+25:11 : Insertion des tags pour le live
+25:28 : Sélection playlist live
+25:46 : Sélection catégorie live
+26:00 : Activation du chat 🐈
+26:15 : Statut public du live
+26:42 : On ajoute un pouce sur le live 👍 😀
+27:00 : Lancement studio de diffusion YT (divers paramètres)
+28:00 : Live OK
+28:10 : Commentaire épinglé sur la vidéo
+30:10 : Vimeo
+31:14 : Réseaux sociaux (Buffer SL)
+33:23 : Buffer SL OK
+33:25 : Buffer JP
+34:42 : Buffer JP OK
+35:00 : Extraction audio de la vidéo
+35:46 : Démonstration de la commande ffmpeg
+36:35 : Publication audio sur AnchorFm
+37:10 : ReVimeo
+39:00 : Génération du message pour le lien vers le live
+40:30 : Ajout du message avec le lien vers le live + épinglage
+41:45 : Maj des URL dynamiques (lien dernier épisode, lien live, ....)
+42:02 : Maj Statut Airtable
+42:17 : Génération description AnchorFm
+42:30 : Post Forum
+45:50 : Tentative de programmation de post sur le forum
