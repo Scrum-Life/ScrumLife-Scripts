@@ -54,7 +54,10 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet build -c ${{ matrix.configuration }} -o binOutput $env:Project_Path 
+      run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path 
+      
+    - name: Publish the package
+      run: dotnet publish -o publish -c ${{ matrix.configuration }} --no-build --no-self-contained --no-restore $env:Project_Path
       
     - name: Easy Zip Files
       # You may pin to the exact commit or the version.
@@ -62,7 +65,7 @@ jobs:
       uses: vimtor/action-zip@v1
       with:
         # Files or directories to zip
-        files: binOutput
+        files: publish
         # Name of output zip file
         dest: result.zip
         # Whether to add subdirectories to simply zip all files to the root
