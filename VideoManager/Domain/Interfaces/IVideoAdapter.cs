@@ -1,7 +1,6 @@
 ﻿using Domain.Models;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +11,8 @@ namespace VideoManager.Domain.Interfaces
         Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken);
         Task<bool> AddOrUpdateCaptionAsync(string videoID, string language, Stream captionStream, CancellationToken cancellationToken);
         Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);
-        Task<IQueryable<VideoCategoryModel>> GetCategoriesAsync(CancellationToken cancellationToken);
+        string BuildVideoUrl(string id);
+        Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         #region Captions
         #endregion
 
@@ -20,6 +20,6 @@ namespace VideoManager.Domain.Interfaces
 
         #endregion
         Task<IList<string>> ListCaptionsAsync(string videoID, CancellationToken cancellationToken);
-        Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, CancellationToken cancellationToken);
+        Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, string liveChatMessage, CancellationToken cancellationToken);
     }
 }

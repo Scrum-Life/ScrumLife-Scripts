@@ -21,5 +21,7 @@ namespace VideoManager.Infrastructure.YouTube
         public string GoogleClientId { get; set; }
 
         public string GoogleClientSecret { get; set; }
+
+        public string ChannelId { get; set; }
     }
 }

@@ -6,6 +6,7 @@ namespace Domain.Data
 {
     public interface IDataAccessorService
     {
-        Task<IReadOnlyList<RecordModel>> GetRecords(int limit);
+        Task<IReadOnlyList<PublicationModel>> GetRecords(int limit);
+        Task<bool> UpdateLiveVideoRecord(string recordId, VideoMetadataModel videoMetadata);
     }
 }

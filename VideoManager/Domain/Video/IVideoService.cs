@@ -6,6 +6,7 @@ namespace Domain.Video
 {
     public interface IVideoService
     {
+        Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         Task UpdateVideoMetadata(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
     }
 }

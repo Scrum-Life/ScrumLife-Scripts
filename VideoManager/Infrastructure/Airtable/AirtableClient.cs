@@ -60,5 +60,27 @@ namespace VideoManager.Infrastructure.Airtable
 
             return results;
         }
+
+        public async Task<bool> UpdateRecord(string recordId, IDictionary<string, object> valuesToUpdate)
+        {
+            using (AirtableBase airtableBase = new AirtableBase(_config.ApiKey, _config.DatabaseId))
+            {
+                Fields f = new Fields();
+                foreach (KeyValuePair<string, object> kvp in valuesToUpdate)
+                {
+                    f.AddField(kvp.Key, kvp.Value);
+                }
+                AirtableCreateUpdateReplaceRecordResponse res = await airtableBase.UpdateRecord(_config.TableName, f, recordId);
+                if(res.Success)
+                {
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError(res.AirtableApiError, $"Une erreur est survenue pendant la mise à jour d'un enregistrement Airtable : {res.AirtableApiError.ErrorName} [{res.AirtableApiError.ErrorCode}] : {res.AirtableApiError.ErrorMessage}");
+                    return false;
+                }
+            }
+        }
     }
 }

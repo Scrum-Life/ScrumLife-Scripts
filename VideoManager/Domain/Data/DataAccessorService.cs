@@ -13,17 +13,62 @@ namespace Domain.Data
         private readonly ILogger<DataAccessorService> _logger;
         private readonly IDataRepositoryAdapter _repository;
         private readonly IMapper _mapper;
+        private readonly IVideoAdapter _videoAdapter;
 
-        public DataAccessorService(ILogger<DataAccessorService> logger, IDataRepositoryAdapter repository, IMapper mapper)
+        public DataAccessorService(ILogger<DataAccessorService> logger, IDataRepositoryAdapter repository, IMapper mapper, IVideoAdapter videoAdapter)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _videoAdapter = videoAdapter ?? throw new ArgumentNullException(nameof(videoAdapter));
         }
 
-        public async Task<IReadOnlyList<RecordModel>> GetRecords(int limit)
+        public async Task<IReadOnlyList<PublicationModel>> GetRecords(int limit)
         {
-            return await _repository.GetRecords(limit);
+            IReadOnlyList<RecordModel> records = await _repository.GetRecords(limit);
+            List<PublicationModel> pubList = new List<PublicationModel>(records.Count);
+
+            foreach (RecordModel rec in records)
+            {
+                pubList.Add(new PublicationModel
+                {
+                    Id = rec.Id,
+                    LiveVideo = new VideoMetadataModel
+                    {
+                        Identifier = rec.GetValueOrDefault<string>("Identifiant unique"),
+                        VideoTitle = rec.GetValueOrDefault<string>("[live bonus] Titre"),
+                        VideoDescription = rec.GetValueOrDefault<string>("[LIVE BONUS] Description"),
+                        PublicationDate = rec.GetValueOrDefault<DateTime>("Date de publication"),
+                        Category = rec.GetValueOrDefault<string>("[live bonus] Catégorie"),
+                        Tags = rec.GetListValues("[LIVE BONUS] Tags", ","),
+                        VideoUrl = rec.GetValueOrDefault<string>("[live bonus] URL")
+                    },
+                    MainVideo = new VideoMetadataModel
+                    {
+                        Identifier = rec.GetValueOrDefault<string>("Identifiant unique"),
+                        VideoTitle = rec.GetValueOrDefault<string>("[youtube] Titre"),
+                        VideoDescription = rec.GetValueOrDefault<string>("[youtube] Description"),
+                        PinnedComment = rec.GetValueOrDefault<string>("[youtube] Commentaire à épingler"),
+                        PublicationDate = rec.GetValueOrDefault<DateTime>("Date de publication"),
+                        Category = rec.GetValueOrDefault<string>("[youtube] Catégorie"),
+                        Tags = rec.GetListValues("[youtube] Tags", ","),
+                        VideoUrl = rec.GetValueOrDefault<string>("[youtube] URL")
+                    }
+                });
+            }
+
+            return pubList;
+        }
+
+        public async Task<bool> UpdateLiveVideoRecord(string recordId, VideoMetadataModel videoMetadata)
+        {
+            Dictionary<string, object> values = new Dictionary<string, object>();
+
+            values.Add("[live bonus] Titre", videoMetadata.VideoTitle);
+            values.Add("[LIVE BONUS] Description", videoMetadata.VideoDescription);
+            values.Add("[live bonus] URL", videoMetadata.VideoUrl);
+
+            return await _repository.UpdateRecord(recordId, values);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AirtableApiClient;
 using AutoMapper;
 using Domain.Models;
+using Google.Apis.YouTube.v3.Data;
 
 namespace VideoManager.Infrastructure
 {
@@ -21,31 +22,26 @@ namespace VideoManager.Infrastructure
         {
             AllowNullCollections = false;
 
-            CreateMap<VideoModel, Google.Apis.YouTube.v3.Data.Video>()
-                .ForPath(m => m.LiveStreamingDetails.ScheduledStartTime, opt => opt.MapFrom(x => x.StartDate))
+            CreateMap<VideoMetadataModel, Google.Apis.YouTube.v3.Data.Video>()
+                .ForPath(m => m.Status.PublishAt, opt => opt.MapFrom(x => x.StartDate))
+                .ForPath(m => m.Status.PrivacyStatus, opt => { 
+                    opt.Condition(x => x.Source.StartDate.HasValue); 
+                    opt.MapFrom(x => "private"); //This value is required by YouTube API when PublishAt is set
+                })
                 .ForPath(m => m.Snippet.DefaultAudioLanguage, opt => opt.MapFrom(x => x.Language))
                 .ForPath(m => m.Snippet.DefaultLanguage, opt => opt.MapFrom(x => x.Language))
-                .ForPath(m => m.Snippet.Description, opt => opt.MapFrom(x => x.Description))
-                .ForPath(m => m.Snippet.Title, opt => opt.MapFrom(x => x.Title))
+                .ForPath(m => m.Snippet.Description, opt => opt.MapFrom(x => x.VideoDescription))
+                .ForPath(m => m.Snippet.Title, opt => opt.MapFrom(x => x.VideoTitle))
                 .ForPath(m => m.Snippet.Tags, opt => opt.MapFrom(x => x.Tags))
-                .ForPath(m => m.Snippet.CategoryId, opt => opt.MapFrom(x => x.CategoryId))
-                //TODO .ForPath(m => m.Snippet.Thumbnails, opt => opt.MapFrom(x => x.StartDate))
                 .ReverseMap()
             ;
 
-            //CreateMap<VideoMetadataModel, Google.Apis.YouTube.v3.Data.Video>()
-            //    .ForPath(m => m.Snippet.Description, opt => opt.MapFrom(x => x.VideoDescription))
-            //    .ForPath(m => m.Snippet.Title, opt => opt.MapFrom(x => x.VideoTitle))
-            //    .ForMember(m => m.Id, opt => { 
-            //        opt.MapFrom(x => x.VideoUrl);
-            //        opt.AddTransform(x => x.Replace("https://www.youtube.com/watch?v=", ""));
-            //    })
-            //    .ReverseMap()
-            //;
-
-            CreateMap<Google.Apis.YouTube.v3.Data.VideoCategory, VideoCategoryModel>()
-                .ForMember(m => m.Id, opt => opt.MapFrom(x => x.Id))
-                .ForMember(m => m.Name, opt => opt.MapFrom(x => x.Snippet.Title));
+            CreateMap<SearchResult, VideoMetadataModel>()
+                .ForMember(m => m.Identifier, opt => opt.MapFrom(x => x.Id.VideoId))
+                .ForMember(m => m.PublicationDate, opt => opt.MapFrom(x => x.Snippet.PublishedAt))
+                .ForMember(m => m.VideoTitle, opt => opt.MapFrom(x => x.Snippet.Title))
+                .ForMember(m => m.VideoDescription, opt => opt.MapFrom(x => x.Snippet.Description))
+            ;
 
             CreateMap<AirtableRecord, RecordModel>();
         }

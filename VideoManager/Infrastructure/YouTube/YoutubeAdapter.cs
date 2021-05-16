@@ -19,16 +19,18 @@ namespace VideoManager.Infrastructure.YouTube
     {
         private readonly ILogger<YoutubeAdapter> _logger;
         private readonly YoutubeServiceProvider _ytServiceProvider;
+        private readonly YoutubeConfiguration _configuration;
         private readonly IMapper _mapper;
 
         private static readonly Regex _ytUrlIdParserRegex = new Regex(@"^.*(?:(?:youtu.be\/)|(?:v\/)|(?:\/u\/\w\/)|(?:embed\/)|(?:watch\?))\??v?=?([a-z0-9_-]*).*", RegexOptions.IgnoreCase);
 
         private const string SNIPPET_PART_PARAM = "snippet";
 
-        public YoutubeAdapter(ILogger<YoutubeAdapter> logger, YoutubeServiceProvider ytServiceProvider, IMapper mapper)
+        public YoutubeAdapter(ILogger<YoutubeAdapter> logger, YoutubeServiceProvider ytServiceProvider, YoutubeConfiguration configuration, IMapper mapper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ytServiceProvider = ytServiceProvider ?? throw new ArgumentNullException(nameof(ytServiceProvider));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -80,27 +82,6 @@ namespace VideoManager.Infrastructure.YouTube
             }
         }
 
-        public async Task<IQueryable<VideoCategoryModel>> GetCategoriesAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                _logger.LogTrace($"Begin {nameof(GetCategoriesAsync)}");
-                YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
-
-                VideoCategoriesResource.ListRequest req = ytService.VideoCategories.List(SNIPPET_PART_PARAM);
-                req.Hl = "fr_FR";
-                req.RegionCode = "fr";
-                VideoCategoryListResponse list = await req.ExecuteAsync(cancellationToken);
-
-                return _mapper.ProjectTo<VideoCategoryModel>(list.Items.Where(cat => cat.Snippet.Assignable.GetValueOrDefault(false)).AsQueryable());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("An error occurred while retrieving video categories", e);
-                throw;
-            }
-        }
-
         public async Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken)
         {
             try
@@ -135,22 +116,38 @@ namespace VideoManager.Infrastructure.YouTube
             }
         }
 
-        public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, CancellationToken cancellationToken)
+        public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, string chatMessage, CancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
-
+                
                 string videoId = GetVideoIdFromUrl(videoMetadataModel.VideoUrl);
                 if (!string.IsNullOrEmpty(videoId))
                 {
+                    IEnumerable<VideoCategory> categories = await GetCategoriesAsync(cancellationToken);
+                    VideoCategory category = categories.FirstOrDefault(c => c.Snippet.Title == videoMetadataModel.Category);
+
                     Video video = await GetVideoMetadataInternalAsync(videoId, cancellationToken);
                     video.Snippet.Title = videoMetadataModel.VideoTitle;
                     video.Snippet.Description = videoMetadataModel.VideoDescription;
+                    video.Snippet.CategoryId = category?.Id;
+                    video.Snippet.Tags = videoMetadataModel.Tags;
+                    video.Status = new VideoStatus { SelfDeclaredMadeForKids = false };
 
-                    VideosResource.UpdateRequest req = ytService.Videos.Update(video, "snippet");
+                    VideosResource.UpdateRequest req = ytService.Videos.Update(video, new string[] { "snippet" , "status" });
                     await req.ExecuteAsync(cancellationToken);
+
+                    if (!string.IsNullOrEmpty(chatMessage))
+                    {
+                        LiveChatMessage msg = new LiveChatMessage { Snippet = new LiveChatMessageSnippet {
+                            LiveChatId = video.LiveStreamingDetails.ActiveLiveChatId,
+                            Type = "textMessageEvent",
+                            TextMessageDetails = new LiveChatTextMessageDetails { MessageText = chatMessage }
+                        } };
+                        ytService.LiveChatMessages.Insert(msg, SNIPPET_PART_PARAM);
+                    }
                 }
             }
             catch (Exception e)
@@ -168,23 +165,11 @@ namespace VideoManager.Infrastructure.YouTube
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
                 Video video = _mapper.Map<Video>(videoModel);
 
-                video.Snippet = new VideoSnippet
-                {
-                    CategoryId = "27",
-                    DefaultLanguage = "fr",
-                    Description = "Ceci est une description",
-                    DefaultAudioLanguage = "fr",
-                    Title = "Ceci est un titre",
-                    Tags = new List<string>() { "test", "toto", "tropbien" }
-                };
-
                 video.AgeGating = new VideoAgeGating { AlcoholContent = false };
                 video.MonetizationDetails = new VideoMonetizationDetails { Access = new AccessPolicy { Allowed = false } };
                 video.Status = new VideoStatus
                 {
-                    MadeForKids = false,
-                    PrivacyStatus = "private",
-                    PublishAt = DateTime.UtcNow.AddHours(6)
+                    MadeForKids = false
                 };
 
                 VideosResource.InsertMediaUpload req = ytService.Videos.Insert(
@@ -222,6 +207,15 @@ namespace VideoManager.Infrastructure.YouTube
             }
         }
 
+        public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
+        {
+            SearchResult res = await GetUpcomingLiveInternalAsync(cancellationToken);
+            VideoMetadataModel metadata = _mapper.Map<VideoMetadataModel>(res);
+            metadata.VideoUrl = BuildVideoUrl(res.Id.VideoId);
+
+            return metadata;
+        }
+
         public static string GetVideoIdFromUrl(string url)
         {
             if (!string.IsNullOrEmpty(url))
@@ -236,7 +230,60 @@ namespace VideoManager.Infrastructure.YouTube
             return null;
         }
 
+        public string BuildVideoUrl(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                return $"https://www.youtube.com/watch?v={id}";
+            }
+
+            return null;
+        }
+
         #region Private methods
+        private async Task<IEnumerable<VideoCategory>> GetCategoriesAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogTrace($"Begin {nameof(GetCategoriesAsync)}");
+                YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
+
+                VideoCategoriesResource.ListRequest req = ytService.VideoCategories.List(SNIPPET_PART_PARAM);
+                req.Hl = "fr_FR";
+                req.RegionCode = "fr";
+                VideoCategoryListResponse list = await req.ExecuteAsync(cancellationToken);
+
+                return list.Items.Where(cat => cat.Snippet.Assignable.GetValueOrDefault(false));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("An error occurred while retrieving video categories", e);
+                throw;
+            }
+        }
+        private async Task<SearchResult> GetUpcomingLiveInternalAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
+                YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
+
+                SearchResource.ListRequest req = ytService.Search.List(SNIPPET_PART_PARAM);
+                req.ChannelId = _configuration.ChannelId;
+                req.EventType = SearchResource.ListRequest.EventTypeEnum.Upcoming;
+                req.Type = "video";
+
+                SearchListResponse res = await req.ExecuteAsync(cancellationToken);
+
+                return res?.Items?.FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("An error occurred while retrieving video metadata", e);
+                throw;
+            }
+        }
+
         private async Task<IList<Caption>> ListCaptionsInternalAsync(string videoID, CancellationToken cancellationToken)
         {
             _logger.LogTrace($"Begin {nameof(ListCaptionsInternalAsync)} for video {videoID}");

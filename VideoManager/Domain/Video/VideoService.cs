@@ -23,7 +23,12 @@ namespace Domain.Video
 
         public async Task UpdateVideoMetadata(VideoMetadataModel videoMetadata, CancellationToken cancellationToken)
         {
-            await _videoAdapter.UpdateVideoMetadataAsync(videoMetadata, cancellationToken);
+            await _videoAdapter.UpdateVideoMetadataAsync(videoMetadata, null, cancellationToken);
+        }
+
+        public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
+        {
+            return await _videoAdapter.GetUpcomingLiveAsync(cancellationToken);
         }
     }
 }

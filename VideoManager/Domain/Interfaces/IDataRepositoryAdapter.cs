@@ -7,5 +7,6 @@ namespace VideoManager.Domain.Interfaces
     public interface IDataRepositoryAdapter
     {
         Task<IReadOnlyList<RecordModel>> GetRecords(int limit);
+        Task<bool> UpdateRecord(string recordId, IDictionary<string, object> valuesToUpdate);
     }
 }

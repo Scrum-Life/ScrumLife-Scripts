@@ -57,7 +57,7 @@ namespace VideoManager.Infrastructure.YouTube
                 return new YouTubeService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credentials,
-                    ApplicationName = _config.AplicationName ?? "YTVideoManager",
+                    ApplicationName = _config.AplicationName ?? "YTVideoManager"
                 });
             }
             catch(Exception e)
