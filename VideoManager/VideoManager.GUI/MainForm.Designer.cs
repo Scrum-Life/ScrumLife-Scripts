@@ -33,8 +33,10 @@ namespace VideoManager.GUI
             this.GetAirtableDataBtn = new System.Windows.Forms.Button();
             this.VideoDGV = new System.Windows.Forms.DataGridView();
             this.UpdateLiveBtn = new System.Windows.Forms.Button();
-            this.UpdateMainVideoBtn = new System.Windows.Forms.Button();
+            this.UploadMainVideoBtn = new System.Windows.Forms.Button();
             this.UpdateAirtableForLiveDataBtn = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.VideoFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.VideoDGV)).BeginInit();
             this.SuspendLayout();
             // 
@@ -80,15 +82,15 @@ namespace VideoManager.GUI
             this.UpdateLiveBtn.UseVisualStyleBackColor = true;
             this.UpdateLiveBtn.Click += new System.EventHandler(this.UpdateLiveBtn_Click);
             // 
-            // UpdateMainVideoBtn
+            // UploadMainVideoBtn
             // 
-            this.UpdateMainVideoBtn.Location = new System.Drawing.Point(12, 357);
-            this.UpdateMainVideoBtn.Name = "UpdateMainVideoBtn";
-            this.UpdateMainVideoBtn.Size = new System.Drawing.Size(233, 23);
-            this.UpdateMainVideoBtn.TabIndex = 2;
-            this.UpdateMainVideoBtn.Text = "Mettre à jour la vidéo principale";
-            this.UpdateMainVideoBtn.UseVisualStyleBackColor = true;
-            this.UpdateMainVideoBtn.Click += new System.EventHandler(this.UpdateVideosBtn_Click);
+            this.UploadMainVideoBtn.Location = new System.Drawing.Point(12, 425);
+            this.UploadMainVideoBtn.Name = "UploadMainVideoBtn";
+            this.UploadMainVideoBtn.Size = new System.Drawing.Size(233, 40);
+            this.UploadMainVideoBtn.TabIndex = 2;
+            this.UploadMainVideoBtn.Text = "Mettre en ligne la vidéo principale...";
+            this.UploadMainVideoBtn.UseVisualStyleBackColor = true;
+            this.UploadMainVideoBtn.Click += new System.EventHandler(this.UploadMainVideoBtn_Click);
             // 
             // UpdateAirtableForLiveDataBtn
             // 
@@ -100,14 +102,34 @@ namespace VideoManager.GUI
             this.UpdateAirtableForLiveDataBtn.UseVisualStyleBackColor = true;
             this.UpdateAirtableForLiveDataBtn.Click += new System.EventHandler(this.UpdateAirtableForLiveDataBtn_Click);
             // 
+            // button1
+            // 
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
+            this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button1.Location = new System.Drawing.Point(12, 357);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(233, 62);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Récupérer les données Airtable";
+            this.button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.GetAirtableDataBtn_Click);
+            // 
+            // VideoFileDialog
+            // 
+            this.VideoFileDialog.Filter = "Vidéos|*.mov,*.mp4|Tous les fichiers|*.*";
+            this.VideoFileDialog.Title = "Sélectionner la vidéo à uploader";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 497);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.UpdateAirtableForLiveDataBtn);
             this.Controls.Add(this.UpdateLiveBtn);
-            this.Controls.Add(this.UpdateMainVideoBtn);
+            this.Controls.Add(this.UploadMainVideoBtn);
             this.Controls.Add(this.VideoDGV);
             this.Controls.Add(this.GetAirtableDataBtn);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -123,8 +145,10 @@ namespace VideoManager.GUI
         private System.Windows.Forms.Button GetAirtableDataBtn;
         private System.Windows.Forms.DataGridView VideoDGV;
         private System.Windows.Forms.Button UpdateLiveBtn;
-        private System.Windows.Forms.Button UpdateMainVideoBtn;
+        private System.Windows.Forms.Button UploadMainVideoBtn;
         private System.Windows.Forms.Button UpdateAirtableForLiveDataBtn;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.OpenFileDialog VideoFileDialog;
     }
 }
 

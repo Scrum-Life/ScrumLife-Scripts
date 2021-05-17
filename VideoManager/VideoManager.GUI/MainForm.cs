@@ -40,16 +40,10 @@ namespace VideoManager.GUI
             VideoDGV.DataSource = records;
         }
 
-        private async void UpdateVideosBtn_Click(object sender, EventArgs e)
-        {
-            foreach(DataGridViewRow row in VideoDGV.SelectedRows)
-            {
-                await _videoService.UpdateVideoMetadata(row.DataBoundItem as VideoMetadataModel, CancellationToken.None);
-            }
-        }
-
         private void UpdateLiveBtn_Click(object sender, EventArgs e)
         {
+            if (!CheckSelectedRow()) return;
+
             try
             {
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
@@ -67,6 +61,8 @@ namespace VideoManager.GUI
 
         private async void UpdateAirtableForLiveDataBtn_Click(object sender, EventArgs e)
         {
+            if (!CheckSelectedRow()) return;
+
             VideoMetadataModel res = await _videoService.GetUpcomingLiveAsync(CancellationToken.None);
 
             if (res != null && !string.IsNullOrEmpty(res.Identifier))
@@ -92,6 +88,43 @@ namespace VideoManager.GUI
             {
                 MessageBox.Show("¯\\(°_o)/¯ Attention, vidéo du live non trouvée. Airtable ne sera pas mis à jour.", "Live non trouvé");
             }
+        }
+
+        private async void UploadMainVideoBtn_Click(object sender, EventArgs e)
+        {
+            if (!CheckSelectedRow()) return;
+
+            foreach (DataGridViewRow row in VideoDGV.SelectedRows)
+            {
+                PublicationModel publicationModel = row.DataBoundItem as PublicationModel;
+
+                DialogResult result = VideoFileDialog.ShowDialog(this);
+                if(result == DialogResult.OK)
+                {
+                    VideoModel videoModel = new VideoModel()
+                    {
+                        Metadata = publicationModel.MainVideo,
+                        VideoStream = VideoFileDialog.OpenFile()
+                    };
+
+                    await _videoService.UploadVideoAsync(videoModel, CancellationToken.None);
+                }
+                else
+                {
+                    MessageBox.Show("OK on fera ça plus tard 😉");
+                }
+            }
+        }
+
+        private bool CheckSelectedRow()
+        {
+            if (VideoDGV.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Vous devez sélectionner une ligne dans le tableau avant de continuer");
+                return false;
+            }
+
+            return true;
         }
     }
 }

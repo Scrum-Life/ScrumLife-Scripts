@@ -11,7 +11,6 @@ namespace VideoManager.Domain.Interfaces
         Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken);
         Task<bool> AddOrUpdateCaptionAsync(string videoID, string language, Stream captionStream, CancellationToken cancellationToken);
         Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);
-        string BuildVideoUrl(string id);
         Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         #region Captions
         #endregion

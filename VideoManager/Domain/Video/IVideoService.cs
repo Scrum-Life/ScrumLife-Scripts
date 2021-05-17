@@ -8,5 +8,6 @@ namespace Domain.Video
     {
         Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         Task UpdateVideoMetadata(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
+        Task UploadVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);
     }
 }

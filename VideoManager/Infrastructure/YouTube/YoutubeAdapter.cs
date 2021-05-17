@@ -34,6 +34,7 @@ namespace VideoManager.Infrastructure.YouTube
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        #region Caption methods
         public async Task<IList<string>> ListCaptionsAsync(string videoID, CancellationToken cancellationToken)
         {
             _logger.LogTrace($"Begin {nameof(ListCaptionsAsync)} for video {videoID}");
@@ -81,7 +82,9 @@ namespace VideoManager.Infrastructure.YouTube
                 return false;
             }
         }
+        #endregion
 
+        #region Comments
         public async Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken)
         {
             try
@@ -115,7 +118,9 @@ namespace VideoManager.Infrastructure.YouTube
                 throw;
             }
         }
+        #endregion
 
+        #region Add/update video
         public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, string chatMessage, CancellationToken cancellationToken)
         {
             try
@@ -130,11 +135,8 @@ namespace VideoManager.Infrastructure.YouTube
                     VideoCategory category = categories.FirstOrDefault(c => c.Snippet.Title == videoMetadataModel.Category);
 
                     Video video = await GetVideoMetadataInternalAsync(videoId, cancellationToken);
-                    video.Snippet.Title = videoMetadataModel.VideoTitle;
-                    video.Snippet.Description = videoMetadataModel.VideoDescription;
-                    video.Snippet.CategoryId = category?.Id;
-                    video.Snippet.Tags = videoMetadataModel.Tags;
-                    video.Status = new VideoStatus { SelfDeclaredMadeForKids = false };
+                    video.HydrateFromVideoModel(videoMetadataModel);
+                    video.Snippet.CategoryId = category.Id;
 
                     VideosResource.UpdateRequest req = ytService.Videos.Update(video, new string[] { "snippet" , "status" });
                     await req.ExecuteAsync(cancellationToken);
@@ -163,18 +165,17 @@ namespace VideoManager.Infrastructure.YouTube
             {
                 _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
-                Video video = _mapper.Map<Video>(videoModel);
 
-                video.AgeGating = new VideoAgeGating { AlcoholContent = false };
-                video.MonetizationDetails = new VideoMonetizationDetails { Access = new AccessPolicy { Allowed = false } };
-                video.Status = new VideoStatus
-                {
-                    MadeForKids = false
-                };
+                IEnumerable<VideoCategory> categories = await GetCategoriesAsync(cancellationToken);
+                VideoCategory category = categories.FirstOrDefault(c => c.Snippet.Title == videoModel.Metadata.Category);
+
+                Video video = _mapper.Map<Video>(videoModel);
+                video.HydrateFromVideoModel(videoModel.Metadata);
+                video.Snippet.CategoryId = category.Id;
 
                 VideosResource.InsertMediaUpload req = ytService.Videos.Insert(
                     video,
-                    new string[] { "snippet", "liveStreamingDetails", "status" },
+                    new string[] { "snippet", "status" },
                     videoModel.VideoStream,
                     "application/octet-stream"
                 );
@@ -206,6 +207,7 @@ namespace VideoManager.Infrastructure.YouTube
                 throw;
             }
         }
+        #endregion
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
         {
@@ -216,6 +218,7 @@ namespace VideoManager.Infrastructure.YouTube
             return metadata;
         }
 
+        #region Utilities
         public static string GetVideoIdFromUrl(string url)
         {
             if (!string.IsNullOrEmpty(url))
@@ -230,7 +233,7 @@ namespace VideoManager.Infrastructure.YouTube
             return null;
         }
 
-        public string BuildVideoUrl(string id)
+        public static string BuildVideoUrl(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -239,6 +242,7 @@ namespace VideoManager.Infrastructure.YouTube
 
             return null;
         }
+        #endregion
 
         #region Private methods
         private async Task<IEnumerable<VideoCategory>> GetCategoriesAsync(CancellationToken cancellationToken)
