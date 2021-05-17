@@ -24,7 +24,7 @@ jobs:
       Project_Directory: VideoManager\VideoManager.GUI    # Replace with the project directory relative to the solution, i.e. MyWpfApp.Package.
       Project_Path: VideoManager\VideoManager.GUI\VideoManager.GUI.csproj                   # Replace with the path to your project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
       SigningCertificate: SLVideoManagerCert.pfx
-      Version_Prefix: 1.0
+      Version_Number: 1.0.${{github.run_number}}
 
     steps:
     - name: Checkout
@@ -61,7 +61,7 @@ jobs:
     - name: Create the app package
       run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path /p:Version=$env:Version
       env: 
-        Version: ${{ env.Version_Prefix }}.${{ github.run_number }}
+        Version: ${{ env.Version_Number }}
       
     - name: Publish the package
       run: dotnet publish -o publish -c ${{ matrix.configuration }} --no-build --no-self-contained --no-restore $env:Project_Path
@@ -89,6 +89,6 @@ jobs:
       uses: ncipollo/release-action@v1
       if: ${{ env.GIT_BRANCH_NAME == 'master' }}
       with:
-        tag: ${{ steps.version.outputs.version }}
+        tag: ${{ env.Version_Number }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifact: result.zip
+        artifacts: result.zip
