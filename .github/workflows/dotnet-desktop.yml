@@ -32,8 +32,8 @@ jobs:
         fetch-depth: 0
     
     - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
+      id: git-branch-name
+      uses: EthanSK/git-branch-name-action@v1
 
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1.8.0
