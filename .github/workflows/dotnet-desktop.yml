@@ -24,6 +24,7 @@ jobs:
       Project_Directory: VideoManager\VideoManager.GUI    # Replace with the project directory relative to the solution, i.e. MyWpfApp.Package.
       Project_Path: VideoManager\VideoManager.GUI\VideoManager.GUI.csproj                   # Replace with the path to your project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
       SigningCertificate: SLVideoManagerCert.pfx
+      Version_Prefix: 1.0
 
     steps:
     - name: Checkout
@@ -49,12 +50,6 @@ jobs:
     - name: Execute unit tests
       run: dotnet test ${{env.Test_Project_Path}}
       
-    # Compute version number
-    - uses: avakar/derive-version@v1
-      id: version
-      with:
-        file: VideoManager\VERSION
-      
     # Restore the application
     - name:  Restore application
       run: dotnet restore $env:Solution_Path /p:Configuration=$env:Configuration
@@ -64,7 +59,7 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path /p:Version=${{ steps.version.outputs.version }}
+      run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path /p:Version=${{ Version_Prefix }}.${{ github.run_id }}
       
     - name: Publish the package
       run: dotnet publish -o publish -c ${{ matrix.configuration }} --no-build --no-self-contained --no-restore $env:Project_Path
