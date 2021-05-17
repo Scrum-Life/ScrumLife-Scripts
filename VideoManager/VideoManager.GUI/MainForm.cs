@@ -126,5 +126,43 @@ namespace VideoManager.GUI
 
             return true;
         }
+
+        private void UpdateMainVideoBtn_Click(object sender, EventArgs e)
+        {
+            if (!CheckSelectedRow()) return;
+
+            try
+            {
+                foreach (DataGridViewRow row in VideoDGV.SelectedRows)
+                {
+                    PublicationModel model = row.DataBoundItem as PublicationModel;
+                    _videoService.UpdateVideoMetadata(model.MainVideo, CancellationToken.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("¯\\(°_o)/¯ Oups, quelque chose s'est mal passé pendant la mise à jour de la vidéo principale.", "Echec mise à jour vidéo");
+                _logger.LogError(ex, "Erreur pendant la mise à jour de la vidéo principale");
+            }
+        }
+
+        private void CommentMainVideoBtn_Click(object sender, EventArgs e)
+        {
+            if (!CheckSelectedRow()) return;
+
+            try
+            {
+                foreach (DataGridViewRow row in VideoDGV.SelectedRows)
+                {
+                    PublicationModel model = row.DataBoundItem as PublicationModel;
+                    _videoService.CommentVideoAsync(model.MainVideo.Identifier, model.MainVideo.PinnedComment, CancellationToken.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("¯\\(°_o)/¯ Oups, quelque chose s'est mal passé pendant l'ajout d'un commentaire sur la vidéo principale.", "Echec ajout commentaire");
+                _logger.LogError(ex, "Erreur pendant l'ajout d'un commentaire");
+            }
+        }
     }
 }

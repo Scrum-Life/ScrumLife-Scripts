@@ -197,7 +197,7 @@ namespace VideoManager.Infrastructure.YouTube
                     }
                 });
 
-                await req.UploadAsync(cancellationToken);
+                IUploadProgress res = await req.UploadAsync(cancellationToken);
                 videoModel.VideoStream.Close();
             }
             catch(Exception e)

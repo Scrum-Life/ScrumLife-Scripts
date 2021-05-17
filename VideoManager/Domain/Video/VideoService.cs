@@ -30,5 +30,8 @@ namespace Domain.Video
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken) =>
             await _videoAdapter.GetUpcomingLiveAsync(cancellationToken);
+
+        public async Task CommentVideoAsync(string videoId, string comment, CancellationToken cancellationToken) =>
+            await _videoAdapter.AddCommentAsync(videoId, comment, cancellationToken);
     }
 }
