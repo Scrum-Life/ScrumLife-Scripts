@@ -30,6 +30,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    
+    - name: Git branch name
+        id: git-branch-name
+        uses: EthanSK/git-branch-name-action@v1
 
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1.8.0
@@ -45,6 +49,10 @@ jobs:
     - name: Execute unit tests
       run: dotnet test ${{env.Test_Project_Path}}
       
+    # Compute version number
+    - uses: avakar/derive-version@v1
+      id: version
+      
     # Restore the application
     - name:  Restore application
       run: dotnet restore $env:Solution_Path /p:Configuration=$env:Configuration
@@ -54,7 +62,7 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path 
+      run: dotnet build -c ${{ matrix.configuration }} $env:Project_Path /p:Version=${{ steps.version.outputs.version }}
       
     - name: Publish the package
       run: dotnet publish -o publish -c ${{ matrix.configuration }} --no-build --no-self-contained --no-restore $env:Project_Path
@@ -71,9 +79,17 @@ jobs:
         # Whether to add subdirectories to simply zip all files to the root
         recursive: true
 
-    # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
+    # Upload the artifact: https://github.com/marketplace/actions/upload-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: VideoManager GUI
         path: result.zip
+        
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      if: ${{ env.GIT_BRANCH_NAME == 'master' }}
+      with:
+        tag: ${{ steps.version.outputs.version }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifact: result.zip
