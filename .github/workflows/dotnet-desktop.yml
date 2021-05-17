@@ -52,6 +52,8 @@ jobs:
     # Compute version number
     - uses: avakar/derive-version@v1
       id: version
+      with:
+        file: VideoManager\VERSION
       
     # Restore the application
     - name:  Restore application
