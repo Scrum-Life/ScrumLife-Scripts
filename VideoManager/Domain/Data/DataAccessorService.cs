@@ -35,7 +35,6 @@ namespace Domain.Data
                     Id = rec.Id,
                     LiveVideo = new VideoMetadataModel
                     {
-                        Identifier = rec.GetValueOrDefault<string>("Identifiant unique"),
                         VideoTitle = rec.GetValueOrDefault<string>("[live bonus] Titre"),
                         VideoDescription = rec.GetValueOrDefault<string>("[LIVE BONUS] Description"),
                         PublicationDate = rec.GetValueOrDefault<DateTime>("Date de publication"),
@@ -45,7 +44,6 @@ namespace Domain.Data
                     },
                     MainVideo = new VideoMetadataModel
                     {
-                        Identifier = rec.GetValueOrDefault<string>("Identifiant unique"),
                         VideoTitle = rec.GetValueOrDefault<string>("[youtube] Titre"),
                         VideoDescription = rec.GetValueOrDefault<string>("[youtube] Description"),
                         PinnedComment = rec.GetValueOrDefault<string>("[youtube] Commentaire à épingler"),

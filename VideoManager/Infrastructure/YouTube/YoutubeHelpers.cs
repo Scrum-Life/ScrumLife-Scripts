@@ -7,6 +7,7 @@ namespace VideoManager.Infrastructure.YouTube
     {
         public static void HydrateFromVideoModel(this Video video, VideoMetadataModel metadata)
         {
+            video.Snippet = video.Snippet is null ? new VideoSnippet() : video.Snippet;
             video.Snippet.Title = metadata.VideoTitle;
             video.Snippet.Description = metadata.VideoDescription;
             video.Snippet.Tags = metadata.Tags;

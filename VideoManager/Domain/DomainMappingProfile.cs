@@ -22,7 +22,7 @@ namespace VideoManager.Infrastructure
             AllowNullCollections = false;
 
             CreateMap<RecordModel, VideoMetadataModel>()
-                .ForMember(m => m.Identifier, opt => opt.MapFrom(m => m.Fields["Identifiant unique"]))
+                //.ForMember(m => m.Identifier, opt => opt.MapFrom(m => m.Fields["Identifiant unique"]))
                 .ForMember(m => m.VideoTitle, opt => opt.MapFrom(m => m.Fields["[youtube] Titre"]))
                 .ForMember(m => m.VideoDescription, opt => opt.MapFrom(m => m.Fields["[youtube] Description"]))
                 .ForMember(m => m.PinnedComment, opt => opt.MapFrom(m => m.Fields["[youtube] Commentaire à épingler"]))

@@ -37,7 +37,7 @@ namespace VideoManager.Infrastructure
             ;
 
             CreateMap<SearchResult, VideoMetadataModel>()
-                .ForMember(m => m.Identifier, opt => opt.MapFrom(x => x.Id.VideoId))
+                //.ForMember(m => m.Identifier, opt => opt.MapFrom(x => x.Id.VideoId))
                 .ForMember(m => m.PublicationDate, opt => opt.MapFrom(x => x.Snippet.PublishedAt))
                 .ForMember(m => m.VideoTitle, opt => opt.MapFrom(x => x.Snippet.Title))
                 .ForMember(m => m.VideoDescription, opt => opt.MapFrom(x => x.Snippet.Description))

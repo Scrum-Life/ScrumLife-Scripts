@@ -65,12 +65,12 @@ namespace VideoManager.GUI
 
             VideoMetadataModel res = await _videoService.GetUpcomingLiveAsync(CancellationToken.None);
 
-            if (res != null && !string.IsNullOrEmpty(res.Identifier))
+            if (res != null && !string.IsNullOrEmpty(res.VideoUrl))
             {
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
                 {
                     PublicationModel model = row.DataBoundItem as PublicationModel;
-                    model.LiveVideo.Identifier = res.Identifier;
+                    //model.LiveVideo.Identifier = res.Identifier;
                     model.LiveVideo.VideoUrl = res.VideoUrl;
 
                     if (await _dataService.UpdateLiveVideoRecord(model.Id, model.LiveVideo))
@@ -155,7 +155,7 @@ namespace VideoManager.GUI
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
                 {
                     PublicationModel model = row.DataBoundItem as PublicationModel;
-                    _videoService.CommentVideoAsync(model.MainVideo.Identifier, model.MainVideo.PinnedComment, CancellationToken.None);
+                    _videoService.CommentVideoAsync(model.MainVideo, CancellationToken.None);
                 }
             }
             catch (Exception ex)

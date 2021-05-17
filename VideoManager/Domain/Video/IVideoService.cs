@@ -6,7 +6,7 @@ namespace Domain.Video
 {
     public interface IVideoService
     {
-        Task CommentVideoAsync(string videoId, string comment, CancellationToken cancellationToken);
+        Task CommentVideoAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
         Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         Task UpdateVideoMetadata(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
         Task UploadVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);

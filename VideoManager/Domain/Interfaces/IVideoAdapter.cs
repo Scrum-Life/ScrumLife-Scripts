@@ -8,7 +8,7 @@ namespace VideoManager.Domain.Interfaces
 {
     public interface IVideoAdapter
     {
-        Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken);
+        Task AddCommentAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
         Task<bool> AddOrUpdateCaptionAsync(string videoID, string language, Stream captionStream, CancellationToken cancellationToken);
         Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);
         Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);

@@ -5,7 +5,7 @@ namespace Domain.Models
 {
     public class VideoMetadataModel
     {
-        public string Identifier { get; set; }
+        //public string Identifier { get; set; }
 
         public DateTime? PublicationDate { get; set; }
 

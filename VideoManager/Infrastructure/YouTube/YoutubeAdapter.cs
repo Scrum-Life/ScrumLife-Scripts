@@ -85,7 +85,7 @@ namespace VideoManager.Infrastructure.YouTube
         #endregion
 
         #region Comments
-        public async Task AddCommentAsync(string comment, string videoId, CancellationToken cancellationToken)
+        public async Task AddCommentAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken)
         {
             try
             {
@@ -96,14 +96,13 @@ namespace VideoManager.Infrastructure.YouTube
                 {
                     Snippet = new CommentThreadSnippet
                     {
-                        VideoId = videoId,
-                        IsPublic = true,
+                        ChannelId = _configuration.ChannelId,
+                        VideoId = GetVideoIdFromUrl(videoMetadata.VideoUrl),
                         TopLevelComment = new Comment
                         {
                             Snippet = new CommentSnippet
                             {
-                                VideoId = videoId,
-                                TextOriginal = comment
+                                TextOriginal = videoMetadata.PinnedComment
                             }
                         }
                     }
@@ -169,7 +168,7 @@ namespace VideoManager.Infrastructure.YouTube
                 IEnumerable<VideoCategory> categories = await GetCategoriesAsync(cancellationToken);
                 VideoCategory category = categories.FirstOrDefault(c => c.Snippet.Title == videoModel.Metadata.Category);
 
-                Video video = _mapper.Map<Video>(videoModel);
+                Video video = new Video();
                 video.HydrateFromVideoModel(videoModel.Metadata);
                 video.Snippet.CategoryId = category.Id;
 
