@@ -8,5 +8,7 @@ namespace Domain.Data
     {
         Task<IReadOnlyList<PublicationModel>> GetRecords(int limit);
         Task<bool> UpdateLiveVideoRecord(string recordId, VideoMetadataModel videoMetadata);
+
+        Task<bool> UpdateMainVideoRecord(string recordId, VideoMetadataModel videoMetadata);
     }
 }

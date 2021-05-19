@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VideoManager.GUI
@@ -49,10 +50,10 @@ namespace VideoManager.GUI
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
                 {
                     PublicationModel model = row.DataBoundItem as PublicationModel;
-                    _videoService.UpdateVideoMetadata(model.LiveVideo, CancellationToken.None);
+                    _videoService.UpdateVideoMetadataAsync(model.LiveVideo, CancellationToken.None);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("¯\\(°_o)/¯ Oups, quelque chose s'est mal passé pendant la mise à jour du live.", "Echec mise à jour du live");
                 _logger.LogError(ex, "Erreur pendant la mise à jour du live");
@@ -94,25 +95,28 @@ namespace VideoManager.GUI
         {
             if (!CheckSelectedRow()) return;
 
-            foreach (DataGridViewRow row in VideoDGV.SelectedRows)
+            Progress<UploadStatusModel> progress = new Progress<UploadStatusModel>(status => {
+                UploadProgressBar.Value = (int)status.CompletionRate;
+                ProgressLabel.Text = $"{status.CompletionRate}% ({status.StatusText})";
+            });
+
+            DataGridViewRow row = VideoDGV.SelectedRows[0];
+            PublicationModel publicationModel = row.DataBoundItem as PublicationModel;
+
+            DialogResult result = VideoFileDialog.ShowDialog(this);
+            if (result == DialogResult.OK)
             {
-                PublicationModel publicationModel = row.DataBoundItem as PublicationModel;
-
-                DialogResult result = VideoFileDialog.ShowDialog(this);
-                if(result == DialogResult.OK)
+                VideoModel videoModel = new VideoModel()
                 {
-                    VideoModel videoModel = new VideoModel()
-                    {
-                        Metadata = publicationModel.MainVideo,
-                        VideoStream = VideoFileDialog.OpenFile()
-                    };
+                    Metadata = publicationModel.MainVideo,
+                    VideoStream = VideoFileDialog.OpenFile()
+                };
 
-                    await _videoService.UploadVideoAsync(videoModel, CancellationToken.None);
-                }
-                else
-                {
-                    MessageBox.Show("OK on fera ça plus tard 😉");
-                }
+                await Task.Run(() => { _videoService.UploadVideoAsync(videoModel, progress, CancellationToken.None); });
+            }
+            else
+            {
+                MessageBox.Show("OK on fera ça plus tard 😉");
             }
         }
 
@@ -127,7 +131,7 @@ namespace VideoManager.GUI
             return true;
         }
 
-        private void UpdateMainVideoBtn_Click(object sender, EventArgs e)
+        private async void UpdateMainVideoBtn_Click(object sender, EventArgs e)
         {
             if (!CheckSelectedRow()) return;
 
@@ -136,7 +140,7 @@ namespace VideoManager.GUI
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
                 {
                     PublicationModel model = row.DataBoundItem as PublicationModel;
-                    _videoService.UpdateVideoMetadata(model.MainVideo, CancellationToken.None);
+                    await _videoService.UpdateVideoMetadataAsync(model.MainVideo, CancellationToken.None);
                 }
             }
             catch (Exception ex)
@@ -146,7 +150,7 @@ namespace VideoManager.GUI
             }
         }
 
-        private void CommentMainVideoBtn_Click(object sender, EventArgs e)
+        private async void CommentMainVideoBtn_Click(object sender, EventArgs e)
         {
             if (!CheckSelectedRow()) return;
 
@@ -155,13 +159,32 @@ namespace VideoManager.GUI
                 foreach (DataGridViewRow row in VideoDGV.SelectedRows)
                 {
                     PublicationModel model = row.DataBoundItem as PublicationModel;
-                    _videoService.CommentVideoAsync(model.MainVideo, CancellationToken.None);
+                    await _videoService.CommentVideoAsync(model.MainVideo, CancellationToken.None);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("¯\\(°_o)/¯ Oups, quelque chose s'est mal passé pendant l'ajout d'un commentaire sur la vidéo principale.", "Echec ajout commentaire");
                 _logger.LogError(ex, "Erreur pendant l'ajout d'un commentaire");
+            }
+        }
+
+        private void UpdateMainVideoAirtableBtn_Click(object sender, EventArgs e)
+        {
+            if (!CheckSelectedRow()) return;
+            foreach (DataGridViewRow row in VideoDGV.SelectedRows)
+            {
+                PublicationModel model = row.DataBoundItem as PublicationModel;
+
+                if (await _dataService.UpdateMainVideoRecord(model.Id, model.MainVideo))
+                {
+                    MessageBox.Show("Airtable a été mis à jour");
+                }
+                else
+                {
+                    MessageBox.Show("Problème pendant la mise à jour de Airtable");
+
+                }
             }
         }
     }

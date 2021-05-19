@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -10,7 +11,7 @@ namespace VideoManager.Domain.Interfaces
     {
         Task AddCommentAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken);
         Task<bool> AddOrUpdateCaptionAsync(string videoID, string language, Stream captionStream, CancellationToken cancellationToken);
-        Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken);
+        Task AddVideoAsync(VideoModel videoModel, IProgress<UploadStatusModel> progress, CancellationToken cancellationToken);
         Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken);
         #region Captions
         #endregion
