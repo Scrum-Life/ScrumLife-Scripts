@@ -21,11 +21,13 @@ namespace Domain.Video
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task UploadVideoAsync(VideoModel videoModel, CancellationToken cancellationToken) =>
-            await _videoAdapter.AddVideoAsync(videoModel, cancellationToken);
+        public async Task UploadVideoAsync(VideoModel videoModel, IProgress<UploadStatusModel> progress, CancellationToken cancellationToken)
+        {
+            await _videoAdapter.AddVideoAsync(videoModel, progress, cancellationToken);
+        }
         
 
-        public async Task UpdateVideoMetadata(VideoMetadataModel videoMetadata, CancellationToken cancellationToken) =>
+        public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken) =>
             await _videoAdapter.UpdateVideoMetadataAsync(videoMetadata, null, cancellationToken);
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken) =>

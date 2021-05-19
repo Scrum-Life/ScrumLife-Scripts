@@ -26,6 +26,8 @@ namespace VideoManager.Infrastructure.YouTube
 
         private const string SNIPPET_PART_PARAM = "snippet";
 
+        private IUploadProgress _currentUpload;
+
         public YoutubeAdapter(ILogger<YoutubeAdapter> logger, YoutubeServiceProvider ytServiceProvider, YoutubeConfiguration configuration, IMapper mapper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -119,7 +121,7 @@ namespace VideoManager.Infrastructure.YouTube
         }
         #endregion
 
-        #region Add/update video
+        #region Add/update/get video
         public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, string chatMessage, CancellationToken cancellationToken)
         {
             try
@@ -158,7 +160,7 @@ namespace VideoManager.Infrastructure.YouTube
             }
         }
 
-        public async Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken)
+        public async Task AddVideoAsync(VideoModel videoModel, IProgress<UploadStatusModel> progress, CancellationToken cancellationToken)
         {
             try
             {
@@ -172,6 +174,8 @@ namespace VideoManager.Infrastructure.YouTube
                 video.HydrateFromVideoModel(videoModel.Metadata);
                 video.Snippet.CategoryId = category.Id;
 
+                long videoBytesLength = videoModel.VideoStream.Length;
+
                 VideosResource.InsertMediaUpload req = ytService.Videos.Insert(
                     video,
                     new string[] { "snippet", "status" },
@@ -183,20 +187,40 @@ namespace VideoManager.Infrastructure.YouTube
 
                 req.ProgressChanged += ((uProgress) =>
                 {
+                    UploadStatusModel status = new UploadStatusModel(videoModel.Metadata);
+                    status.IsComplete = false;
+                    status.IsSuccess = false;
+                    status.StatusText = $"{uProgress.Status} ({uProgress.BytesSent} bytes sent)";
+                    status.CompletionRate = (uProgress.BytesSent * 100) / videoBytesLength;
+                    progress.Report(status);
                     _logger.LogInformation($"Upload of video : {uProgress.BytesSent} bytes sent");
                 });
 
                 req.ResponseReceived += ((video) =>
                 {
                     _logger.LogInformation($"Upload of video is complete : {video.Id}");
+                    UploadStatusModel status = new UploadStatusModel(videoModel.Metadata);
+                    status.IsComplete = true;
+
+                    videoModel.Metadata.VideoUrl = BuildVideoUrl(video.Id);
+                    
                     if (!string.IsNullOrEmpty(video.ProcessingDetails?.ProcessingFailureReason))
                     {
                         _logger.LogError($"Error while processing video upload : {video.ProcessingDetails.ProcessingFailureReason}");
                         _logger.LogError($"{video.ProcessingDetails.ProcessingIssuesAvailability ?? "No reason"}");
+
+                        progress.Report(status);
+                    }
+                    else
+                    {
+                        status.IsSuccess = true;
+                        status.CompletionRate = 100;
+                        progress.Report(status);
                     }
                 });
 
                 IUploadProgress res = await req.UploadAsync(cancellationToken);
+
                 videoModel.VideoStream.Close();
             }
             catch(Exception e)
@@ -206,7 +230,6 @@ namespace VideoManager.Infrastructure.YouTube
                 throw;
             }
         }
-        #endregion
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
         {
@@ -216,6 +239,7 @@ namespace VideoManager.Infrastructure.YouTube
 
             return metadata;
         }
+        #endregion
 
         #region Utilities
         public static string GetVideoIdFromUrl(string url)
