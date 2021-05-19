@@ -169,7 +169,7 @@ namespace VideoManager.GUI
             }
         }
 
-        private void UpdateMainVideoAirtableBtn_Click(object sender, EventArgs e)
+        private async void UpdateMainVideoAirtableBtn_Click(object sender, EventArgs e)
         {
             if (!CheckSelectedRow()) return;
             foreach (DataGridViewRow row in VideoDGV.SelectedRows)
