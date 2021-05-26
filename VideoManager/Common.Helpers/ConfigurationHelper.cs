@@ -38,7 +38,7 @@ namespace VideoManager.Helpers
 
             if (result.Length > 0)
             {
-                throw new MissingConfigurationException($"Object {type.Name} has some empty properties: {string.Join(", ", result)}. Please check appsettings.<ENV>.json or environment variables.");
+                throw new MissingConfigurationException($"Object {type.Name} has some empty properties: {string.Join(", ", result)}. Please check appsettings.json file or environment variables.");
             }
         }
     }

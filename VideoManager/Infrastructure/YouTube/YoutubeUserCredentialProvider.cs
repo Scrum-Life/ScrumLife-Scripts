@@ -18,11 +18,13 @@ namespace VideoManager.Infrastructure.YouTube
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
+
+            _logger.LogTrace($"{GetType()} initialization");
         }
 
         private async Task<UserCredential> GetUserCredentialAsync(CancellationToken cancelationToken)
         {
-            _logger.LogDebug($"GetTypeGetUserCredentialAsync for user {_config.Username}");
+            _logger.LogTrace($"GetUserCredentialAsync");
             try
             {
                 return await GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -36,7 +38,7 @@ namespace VideoManager.Infrastructure.YouTube
                             YouTubeService.Scope.Youtube, 
                             YouTubeService.Scope.Youtubepartner 
                         },
-                        _config.Username,
+                        "user",
                         cancelationToken,
                         new FileDataStore(GetType().ToString())
                 );
@@ -50,6 +52,8 @@ namespace VideoManager.Infrastructure.YouTube
 
         public async Task<YouTubeService> CreateServiceAsync(CancellationToken cancelationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(CreateServiceAsync)}");
+            
             try
             {
                 UserCredential credentials = await GetUserCredentialAsync(cancelationToken);

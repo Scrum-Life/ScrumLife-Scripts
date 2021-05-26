@@ -21,10 +21,14 @@ namespace Domain.Data
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _videoAdapter = videoAdapter ?? throw new ArgumentNullException(nameof(videoAdapter));
+
+            _logger.LogTrace($"{GetType()} initialization");
         }
 
         public async Task<IReadOnlyList<PublicationModel>> GetRecords(int limit)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetRecords)}");
+
             IReadOnlyList<RecordModel> records = await _repository.GetRecords(limit);
             List<PublicationModel> pubList = new List<PublicationModel>(records.Count);
 
@@ -60,6 +64,8 @@ namespace Domain.Data
 
         public async Task<bool> UpdateLiveVideoRecord(string recordId, VideoMetadataModel videoMetadata)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateLiveVideoRecord)}");
+
             Dictionary<string, object> values = new Dictionary<string, object>();
 
             values.Add("[live bonus] Titre", videoMetadata.VideoTitle);

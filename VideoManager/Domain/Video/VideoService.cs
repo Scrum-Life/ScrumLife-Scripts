@@ -19,6 +19,8 @@ namespace Domain.Video
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _videoAdapter = videoAdapter ?? throw new ArgumentNullException(nameof(videoAdapter));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+
+            _logger.LogTrace($"{GetType()} initialization");
         }
 
         public async Task UploadVideoAsync(VideoModel videoModel, CancellationToken cancellationToken) =>

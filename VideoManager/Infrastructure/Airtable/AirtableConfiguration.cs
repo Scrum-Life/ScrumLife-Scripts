@@ -7,5 +7,7 @@
         public string DatabaseId { get; set; }
 
         public string TableName { get; set; }
+
+        public string ViewName { get; set; }
     }
 }

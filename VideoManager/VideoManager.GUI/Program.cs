@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 using VideoManager.Infrastructure;
 
@@ -53,6 +52,7 @@ namespace VideoManager.GUI
                         .CreateLogger();
                 }
 
+                MessageBox.Show(ex.Message, "¯\\(°_o)/¯ Something went wrong and the application just crashed!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 Log.Fatal(ex, "¯\\(°_o)/¯ Something went wrong and the application just crashed!");
             }
             finally

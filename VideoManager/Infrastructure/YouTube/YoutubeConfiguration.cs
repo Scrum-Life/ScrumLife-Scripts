@@ -1,18 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace VideoManager.Infrastructure.YouTube
+﻿namespace VideoManager.Infrastructure.YouTube
 {
     /// <summary>
     /// YouTube API configuration
     /// </summary>
     public sealed class YoutubeConfiguration
     {
-        /// <summary>
-        /// Youtube channel username
-        /// </summary>
-        [Required]
-        public string Username { get; set; }
-
         /// <summary>
         /// Application name as it will be seen by YouTube API
         /// </summary>

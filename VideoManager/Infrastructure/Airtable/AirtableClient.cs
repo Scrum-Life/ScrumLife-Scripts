@@ -21,10 +21,14 @@ namespace VideoManager.Infrastructure.Airtable
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _config = config ?? throw new ArgumentNullException(nameof(config));
+
+            _logger.LogTrace($"{GetType()} initialization");
         }
 
         public async Task<IReadOnlyList<RecordModel>> GetRecords(int limit)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetRecords)} with limit:{limit}"); 
+            
             string errorMessage = "";
             string offset;
             List<RecordModel> results = new List<RecordModel>();
@@ -33,7 +37,7 @@ namespace VideoManager.Infrastructure.Airtable
             {
                 do
                 {
-                    AirtableListRecordsResponse res = await airtableBase.ListRecords(_config.TableName, maxRecords: limit);
+                    AirtableListRecordsResponse res = await airtableBase.ListRecords(_config.TableName, view:_config.ViewName, maxRecords: limit);
 
                     if (res.Success)
                     {
@@ -63,6 +67,8 @@ namespace VideoManager.Infrastructure.Airtable
 
         public async Task<bool> UpdateRecord(string recordId, IDictionary<string, object> valuesToUpdate)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateRecord)}"); 
+            
             using (AirtableBase airtableBase = new AirtableBase(_config.ApiKey, _config.DatabaseId))
             {
                 Fields f = new Fields();

@@ -17,8 +17,6 @@ namespace VideoManager.GUI
         private readonly IDataAccessorService _dataService;
         private readonly IVideoService _videoService;
 
-        private IReadOnlyList<PublicationModel> _metadataSource;
-
         public MainForm(ILogger<MainForm> logger, IMapper mapper, IDataAccessorService dataService, IVideoService videoService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -29,19 +27,20 @@ namespace VideoManager.GUI
             InitializeComponent();
 
             Text = $"Video Manager - {GetType().Assembly.GetName().Version}";
+            _logger.LogInformation($"{Text} started!");
         }
 
         private async void GetAirtableDataBtn_Click(object sender, EventArgs e)
         {
-            IReadOnlyList<PublicationModel> records = await _dataService.GetRecords(10);
-
-            _metadataSource = records;
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetAirtableDataBtn_Click)}");
+            IReadOnlyList<PublicationModel> records = await _dataService.GetRecords(300);
 
             VideoDGV.DataSource = records;
         }
 
         private void UpdateLiveBtn_Click(object sender, EventArgs e)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateLiveBtn_Click)}");
             if (!CheckSelectedRow()) return;
 
             try
@@ -61,6 +60,7 @@ namespace VideoManager.GUI
 
         private async void UpdateAirtableForLiveDataBtn_Click(object sender, EventArgs e)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateAirtableForLiveDataBtn_Click)}");
             if (!CheckSelectedRow()) return;
 
             VideoMetadataModel res = await _videoService.GetUpcomingLiveAsync(CancellationToken.None);
@@ -92,6 +92,7 @@ namespace VideoManager.GUI
 
         private async void UploadMainVideoBtn_Click(object sender, EventArgs e)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UploadMainVideoBtn_Click)}");
             if (!CheckSelectedRow()) return;
 
             foreach (DataGridViewRow row in VideoDGV.SelectedRows)
@@ -118,6 +119,7 @@ namespace VideoManager.GUI
 
         private bool CheckSelectedRow()
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(CheckSelectedRow)}");
             if (VideoDGV.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Vous devez sélectionner une ligne dans le tableau avant de continuer");
@@ -129,6 +131,7 @@ namespace VideoManager.GUI
 
         private void UpdateMainVideoBtn_Click(object sender, EventArgs e)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateMainVideoBtn_Click)}");
             if (!CheckSelectedRow()) return;
 
             try
@@ -148,6 +151,7 @@ namespace VideoManager.GUI
 
         private void CommentMainVideoBtn_Click(object sender, EventArgs e)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(CommentMainVideoBtn_Click)}");
             if (!CheckSelectedRow()) return;
 
             try

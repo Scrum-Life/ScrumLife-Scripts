@@ -32,21 +32,25 @@ namespace VideoManager.Infrastructure.YouTube
             _ytServiceProvider = ytServiceProvider ?? throw new ArgumentNullException(nameof(ytServiceProvider));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+
+            _logger.LogTrace($"{GetType()} initialization");
         }
 
         #region Caption methods
         public async Task<IList<string>> ListCaptionsAsync(string videoID, CancellationToken cancellationToken)
         {
-            _logger.LogTrace($"Begin {nameof(ListCaptionsAsync)} for video {videoID}");
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(ListCaptionsAsync)} for video {videoID}"); 
+            
             IList<Caption> res = await ListCaptionsInternalAsync(videoID, cancellationToken);
             return res.Select(c => c.Snippet.Language).ToList();
         }
 
         public async Task<bool> AddOrUpdateCaptionAsync(string videoID, string language, Stream captionStream, CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(AddOrUpdateCaptionAsync)} for video {videoID}"); 
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddOrUpdateCaptionAsync)} for video {videoID}");
                 bool res = false;
 
                 //Checks if a caption already exists for this video
@@ -87,9 +91,10 @@ namespace VideoManager.Infrastructure.YouTube
         #region Comments
         public async Task AddCommentAsync(VideoMetadataModel videoMetadata, CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(AddVideoAsync)}"); 
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 CommentThread commentThread = new CommentThread()
@@ -122,9 +127,10 @@ namespace VideoManager.Infrastructure.YouTube
         #region Add/update video
         public async Task UpdateVideoMetadataAsync(VideoMetadataModel videoMetadataModel, string chatMessage, CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateVideoMetadataAsync)}");
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
                 
                 string videoId = GetVideoIdFromUrl(videoMetadataModel.VideoUrl);
@@ -160,9 +166,10 @@ namespace VideoManager.Infrastructure.YouTube
 
         public async Task AddVideoAsync(VideoModel videoModel, CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(AddVideoAsync)}"); 
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 IEnumerable<VideoCategory> categories = await GetCategoriesAsync(cancellationToken);
@@ -210,6 +217,8 @@ namespace VideoManager.Infrastructure.YouTube
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetUpcomingLiveAsync)}"); 
+            
             SearchResult res = await GetUpcomingLiveInternalAsync(cancellationToken);
             VideoMetadataModel metadata = _mapper.Map<VideoMetadataModel>(res);
             metadata.VideoUrl = BuildVideoUrl(res.Id.VideoId);
@@ -246,9 +255,10 @@ namespace VideoManager.Infrastructure.YouTube
         #region Private methods
         private async Task<IEnumerable<VideoCategory>> GetCategoriesAsync(CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetCategoriesAsync)}");
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(GetCategoriesAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 VideoCategoriesResource.ListRequest req = ytService.VideoCategories.List(SNIPPET_PART_PARAM);
@@ -266,9 +276,10 @@ namespace VideoManager.Infrastructure.YouTube
         }
         private async Task<SearchResult> GetUpcomingLiveInternalAsync(CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetUpcomingLiveInternalAsync)}");
+            
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 SearchResource.ListRequest req = ytService.Search.List(SNIPPET_PART_PARAM);
@@ -289,7 +300,7 @@ namespace VideoManager.Infrastructure.YouTube
 
         private async Task<IList<Caption>> ListCaptionsInternalAsync(string videoID, CancellationToken cancellationToken)
         {
-            _logger.LogTrace($"Begin {nameof(ListCaptionsInternalAsync)} for video {videoID}");
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(ListCaptionsInternalAsync)} for video {videoID}"); 
             YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
             CaptionsResource.ListRequest captionsRequest = ytService.Captions.List(SNIPPET_PART_PARAM, videoID);
@@ -303,7 +314,7 @@ namespace VideoManager.Infrastructure.YouTube
         {
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddCaptionInternalAsync)} for video {caption.Snippet.VideoId}");
+                _logger.LogTrace($"{GetType()} - BEGIN {nameof(AddCaptionInternalAsync)} for video {caption.Snippet.VideoId}"); 
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 //create the request now and insert our params...
@@ -322,7 +333,7 @@ namespace VideoManager.Infrastructure.YouTube
         {
             try
             {
-                _logger.LogTrace($"Begin {nameof(UpdateCaptionInternalAsync)} for video {caption.Snippet.VideoId}");
+                _logger.LogTrace($"{GetType()} - BEGIN {nameof(UpdateCaptionInternalAsync)} for video {caption.Snippet.VideoId}");
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 //using MemoryStream ms = new MemoryStream(captionBytes);
@@ -340,6 +351,8 @@ namespace VideoManager.Infrastructure.YouTube
 
         private async Task<bool> UploadCaptionAsync(ResumableUpload uploadRequest, CancellationToken cancellationToken)
         {
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(UploadCaptionAsync)}");
+            
             //finally upload the request... and wait.
             //TODO Créer un taskmanager pour suivre l'avancement des taches lancées
             IUploadProgress res = await uploadRequest.UploadAsync(cancellationToken);
@@ -367,7 +380,7 @@ namespace VideoManager.Infrastructure.YouTube
         {
             try
             {
-                _logger.LogTrace($"Begin {nameof(AddVideoAsync)}");
+                _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetVideoMetadataInternalAsync)}"); 
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
                 VideosResource.ListRequest req = ytService.Videos.List(SNIPPET_PART_PARAM);
