@@ -50,6 +50,8 @@ namespace VideoManager.GUI
             this.ProgressLabel = new System.Windows.Forms.Label();
             this.UpdateMainVideoAirtableBtn = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.VideoDGV)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,7 +89,7 @@ namespace VideoManager.GUI
             // 
             // UpdateLiveBtn
             // 
-            this.UpdateLiveBtn.Location = new System.Drawing.Point(35, 295);
+            this.UpdateLiveBtn.Location = new System.Drawing.Point(36, 567);
             this.UpdateLiveBtn.Name = "UpdateLiveBtn";
             this.UpdateLiveBtn.Size = new System.Drawing.Size(233, 56);
             this.UpdateLiveBtn.TabIndex = 6;
@@ -97,7 +99,7 @@ namespace VideoManager.GUI
             // 
             // UploadMainVideoBtn
             // 
-            this.UploadMainVideoBtn.Location = new System.Drawing.Point(35, 425);
+            this.UploadMainVideoBtn.Location = new System.Drawing.Point(35, 360);
             this.UploadMainVideoBtn.Name = "UploadMainVideoBtn";
             this.UploadMainVideoBtn.Size = new System.Drawing.Size(233, 40);
             this.UploadMainVideoBtn.TabIndex = 2;
@@ -120,7 +122,7 @@ namespace VideoManager.GUI
             this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
             this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button1.Location = new System.Drawing.Point(35, 357);
+            this.button1.Location = new System.Drawing.Point(35, 292);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(233, 62);
             this.button1.TabIndex = 8;
@@ -175,7 +177,7 @@ namespace VideoManager.GUI
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(16, 381);
+            this.label3.Location = new System.Drawing.Point(16, 373);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(13, 15);
             this.label3.TabIndex = 13;
@@ -184,7 +186,7 @@ namespace VideoManager.GUI
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 438);
+            this.label4.Location = new System.Drawing.Point(16, 419);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(13, 15);
             this.label4.TabIndex = 14;
@@ -193,7 +195,7 @@ namespace VideoManager.GUI
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(16, 484);
+            this.label5.Location = new System.Drawing.Point(12, 474);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(13, 15);
             this.label5.TabIndex = 15;
@@ -235,7 +237,7 @@ namespace VideoManager.GUI
             // 
             // UpdateMainVideoAirtableBtn
             // 
-            this.UpdateMainVideoAirtableBtn.Location = new System.Drawing.Point(35, 471);
+            this.UpdateMainVideoAirtableBtn.Location = new System.Drawing.Point(36, 406);
             this.UpdateMainVideoAirtableBtn.Name = "UpdateMainVideoAirtableBtn";
             this.UpdateMainVideoAirtableBtn.Size = new System.Drawing.Size(232, 41);
             this.UpdateMainVideoAirtableBtn.TabIndex = 20;
@@ -252,11 +254,36 @@ namespace VideoManager.GUI
             this.label8.TabIndex = 21;
             this.label8.Text = "6";
             // 
+            // button2
+            // 
+            this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button2.Image = ((System.Drawing.Image)(resources.GetObject("button2.Image")));
+            this.button2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button2.Location = new System.Drawing.Point(36, 450);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(233, 62);
+            this.button2.TabIndex = 22;
+            this.button2.Text = "Récupérer les données Airtable";
+            this.button2.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.GetAirtableDataBtn_Click);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(17, 588);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(13, 15);
+            this.label9.TabIndex = 23;
+            this.label9.Text = "7";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 589);
+            this.ClientSize = new System.Drawing.Size(800, 844);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.UpdateMainVideoAirtableBtn);
             this.Controls.Add(this.ProgressLabel);
@@ -278,7 +305,7 @@ namespace VideoManager.GUI
             this.Controls.Add(this.GetAirtableDataBtn);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
-            this.Text = "Video Manager";
+            this.Text = "VideoManager";
             ((System.ComponentModel.ISupportInitialize)(this.VideoDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -307,6 +334,8 @@ namespace VideoManager.GUI
         private System.Windows.Forms.Label ProgressLabel;
         private System.Windows.Forms.Button UpdateMainVideoAirtableBtn;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label9;
     }
 }
 
