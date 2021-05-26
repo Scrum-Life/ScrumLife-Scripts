@@ -74,5 +74,16 @@ namespace Domain.Data
 
             return await _repository.UpdateRecord(recordId, values);
         }
+
+        public async Task<bool> UpdateMainVideoRecord(string recordId, VideoMetadataModel videoMetadata)
+        {
+            Dictionary<string, object> values = new Dictionary<string, object>();
+
+            values.Add("[youtube] Titre", videoMetadata.VideoTitle);
+            values.Add("[youtube] Description", videoMetadata.VideoDescription);
+            values.Add("[youtube] URL", videoMetadata.VideoUrl);
+
+            return await _repository.UpdateRecord(recordId, values);
+        }
     }
 }
