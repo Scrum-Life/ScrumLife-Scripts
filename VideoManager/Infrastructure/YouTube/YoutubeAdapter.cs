@@ -240,13 +240,18 @@ namespace VideoManager.Infrastructure.YouTube
 
         public async Task<VideoMetadataModel> GetUpcomingLiveAsync(CancellationToken cancellationToken)
         {
-            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetUpcomingLiveAsync)}"); 
-            
-            SearchResult res = await GetUpcomingLiveInternalAsync(cancellationToken);
-            VideoMetadataModel metadata = _mapper.Map<VideoMetadataModel>(res);
-            metadata.VideoUrl = BuildVideoUrl(res.Id.VideoId);
+            _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetUpcomingLiveAsync)}");
 
-            return metadata;
+            LiveBroadcast res = await GetUpcomingLiveInternalAsync(cancellationToken);
+            if (res != null)
+            {
+                VideoMetadataModel metadata = _mapper.Map<VideoMetadataModel>(res);
+                metadata.VideoUrl = BuildVideoUrl(res.Id);
+
+                return metadata;
+            }
+
+            return null;
         }
         #endregion
 
@@ -298,7 +303,7 @@ namespace VideoManager.Infrastructure.YouTube
                 throw;
             }
         }
-        private async Task<SearchResult> GetUpcomingLiveInternalAsync(CancellationToken cancellationToken)
+        private async Task<LiveBroadcast> GetUpcomingLiveInternalAsync(CancellationToken cancellationToken)
         {
             _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetUpcomingLiveInternalAsync)}");
             
@@ -306,12 +311,10 @@ namespace VideoManager.Infrastructure.YouTube
             {
                 YouTubeService ytService = await _ytServiceProvider.CreateServiceAsync(cancellationToken);
 
-                SearchResource.ListRequest req = ytService.Search.List(SNIPPET_PART_PARAM);
-                req.ChannelId = _configuration.ChannelId;
-                req.EventType = SearchResource.ListRequest.EventTypeEnum.Upcoming;
-                req.Type = "video";
+                LiveBroadcastsResource.ListRequest req = ytService.LiveBroadcasts.List(SNIPPET_PART_PARAM);
+                req.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.Upcoming;
 
-                SearchListResponse res = await req.ExecuteAsync(cancellationToken);
+                LiveBroadcastListResponse res = await req.ExecuteAsync(cancellationToken);
 
                 return res?.Items?.FirstOrDefault();
             }

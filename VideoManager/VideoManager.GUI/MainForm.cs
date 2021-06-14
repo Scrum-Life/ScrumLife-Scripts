@@ -34,7 +34,7 @@ namespace VideoManager.GUI
         private async void GetAirtableDataBtn_Click(object sender, EventArgs e)
         {
             _logger.LogTrace($"{GetType()} - BEGIN {nameof(GetAirtableDataBtn_Click)}");
-            IReadOnlyList<PublicationModel> records = await _dataService.GetRecords(300);
+            IReadOnlyList<PublicationModel> records = await _dataService.GetRecords(10);
 
             VideoDGV.DataSource = records;
         }
@@ -74,15 +74,15 @@ namespace VideoManager.GUI
                     //model.LiveVideo.Identifier = res.Identifier;
                     model.LiveVideo.VideoUrl = res.VideoUrl;
 
-                    if (await _dataService.UpdateLiveVideoRecord(model.Id, model.LiveVideo))
-                    {
-                        MessageBox.Show("Airtable a été mis à jour");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Problème pendant la mise à jour de Airtable");
+                    //if (await _dataService.UpdateLiveVideoRecord(model.Id, model.LiveVideo))
+                    //{
+                    //    MessageBox.Show("Airtable a été mis à jour");
+                    //}
+                    //else
+                    //{
+                    //    MessageBox.Show("Problème pendant la mise à jour de Airtable");
 
-                    }
+                    //}
                 }
             }
             else
